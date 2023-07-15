@@ -1,8 +1,13 @@
-package ru.practicum;
+package ru.practicum.service;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import ru.practicum.EndpointHitDto;
+import ru.practicum.model.Stat;
 
+/**
+ * Маппер модели статистики
+ */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class StatMapper {
 
