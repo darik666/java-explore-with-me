@@ -3,6 +3,7 @@ package ru.practicum.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.practicum.State;
+import ru.practicum.ViewStatsDto;
 import ru.practicum.client.EwmClient;
 import ru.practicum.dto.*;
 import ru.practicum.exception.NotFoundException;
@@ -14,6 +15,7 @@ import ru.practicum.service.categories.CategoryMapper;
 
 import javax.transaction.Transactional;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,12 +64,25 @@ public class EventMapper {
         dto.setPaid(event.getPaid());
         dto.setRequestModeration(event.getRequestModeration());
         dto.setState(String.valueOf(event.getState()));
-        dto.setEventDate(String.valueOf(event.getEventDate()));
+        dto.setEventDate(event.getEventDate());
         dto.setPublishedOn(String.valueOf(event.getPublishedOn()));
         dto.setCreatedOn(String.valueOf(event.getCreated()));
 
+        List<String> uris = new ArrayList<>();
+        uris.add("/events/" + event.getId());
         try {
-            dto.setViews((Integer) client.getViews("/events/" + event.getId()));
+            Object views = client.getViews(
+                    dto.getEventDate().minusYears(99),
+                    dto.getEventDate().plusYears(99),
+                    uris,
+                    true
+            );
+            List<ViewStatsDto> viewStats = (List<ViewStatsDto>) views;
+            if (!viewStats.isEmpty()) {
+                dto.setViews(viewStats.get(0).getHits().intValue());
+            } else {
+                dto.setViews(0);
+            }
         } catch (Exception e) {
             dto.setViews(null);
         }
@@ -85,10 +100,23 @@ public class EventMapper {
         dto.setCategory(CategoryMapper.toCategoryDto(event.getCategory()));
         dto.setInitiator(UserMapper.toUserShortDto(event.getInitiator()));
         dto.setPaid(event.getPaid());
-        dto.setEventDate(String.valueOf(event.getEventDate()));
+        dto.setEventDate(event.getEventDate());
 
+        List<String> uris = new ArrayList<>();
+        uris.add("/events/" + event.getId());
         try {
-            dto.setViews((Integer) client.getViews("/events/" + event.getId()));
+            Object views = client.getViews(
+                    dto.getEventDate().minusYears(99),
+                    dto.getEventDate().plusYears(99),
+                    uris,
+                    true
+            );
+            List<ViewStatsDto> viewStats = (List<ViewStatsDto>) views;
+            if (!viewStats.isEmpty()) {
+                dto.setViews(viewStats.get(0).getHits().longValue());
+            } else {
+                dto.setViews(0L);
+            }
         } catch (Exception e) {
             dto.setViews(null);
         }

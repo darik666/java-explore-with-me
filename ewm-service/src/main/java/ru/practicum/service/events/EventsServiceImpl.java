@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EventStatus;
 import ru.practicum.Sort;
 import ru.practicum.State;
+import ru.practicum.ViewStatsDto;
+import ru.practicum.client.EwmClient;
 import ru.practicum.dto.*;
 import ru.practicum.exception.EventValidationException;
 import ru.practicum.exception.NotFoundException;
@@ -23,6 +25,7 @@ import ru.practicum.service.ParticipationRequestMapper;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +36,7 @@ public class EventsServiceImpl implements EventsService {
     private final EventRepository eventRepository;
     private final ParticipationRequestRepository participationRequestRepository;
     private final UserRepository userRepository;
+    private final EwmClient ewmClient;
 
     @Override
     public List<EventFullDto> getEvents(List<Long> users,
@@ -42,7 +46,7 @@ public class EventsServiceImpl implements EventsService {
                                         LocalDateTime rangeEnd,
                                         int from,
                                         int size) {
-        Pageable pageable = (Pageable) PageRequest.of(from, size);
+        Pageable pageable = PageRequest.of(from, size);
         Page<Event> eventPage = eventRepository.getEventsAdmin(users, states, categories, rangeStart, rangeEnd, pageable);
         List<Event> events = eventPage.getContent();
         return events.stream()
@@ -117,32 +121,57 @@ public class EventsServiceImpl implements EventsService {
         return event;
     }
 
-    @Override
     public List<EventShortDto> getAll(String text,
                                       List<Long> categories,
-                                      Boolean paid, LocalDateTime rangeStart,
+                                      Boolean paid,
+                                      LocalDateTime rangeStart,
                                       LocalDateTime rangeEnd,
                                       Boolean onlyAvailable,
                                       Sort sort,
                                       int from,
                                       int size) {
-        Pageable pageable = (Pageable) PageRequest.of(from / size, size);
+        List<Event> events = eventRepository.findAllEvents(
+                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, PageRequest.of(from, size));
 
-        List<Event> eventPage = eventRepository.getAllEvents(text,
-                categories,
-                paid,
-                rangeStart,
-                rangeEnd,
-                onlyAvailable,
-                String.valueOf(sort),
-                pageable).getContent();
-
-        List<EventShortDto> eventShortDtos = eventPage
-                .stream()
-                .map(EventMapper::toShortDto)
+        List<String> uris = events.stream()
+                .map(event -> "/events/" + event.getId())
                 .collect(Collectors.toList());
 
-        return eventShortDtos;
+        Object views = ewmClient.getViews(rangeStart, rangeEnd, uris, true);
+        List<ViewStatsDto> viewStats = (List<ViewStatsDto>) views;
+
+        List<EventShortDto> eventDtos = events.stream()
+                .map(event -> {
+                    Long viewsCount = viewStats.stream()
+                            .filter(viewStat -> viewStat.getUri().equals("/events/" + event.getId()))
+                            .mapToLong(ViewStatsDto::getHits)
+                            .findFirst()
+                            .orElse(0L);
+                    return new EventShortDto(
+                            event.getId(),
+                            event.getAnnotation(),
+                            new CategoryDto(event.getCategory().getId(), event.getCategory().getName()),
+                            event.getConfirmedRequests(),
+                            event.getEventDate(),
+                            new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
+                            event.getPaid(),
+                            event.getTitle(),
+                            viewsCount
+                    );
+                })
+                .collect(Collectors.toList());
+
+        if (sort != null) {
+            if (sort.equals("EVENT_DATE")) {
+                eventDtos.sort(Comparator.comparing(EventShortDto::getEventDate)
+                        .thenComparing(EventShortDto::getViews).reversed());
+            } else if (sort.equals("VIEWS")) {
+                eventDtos.sort(Comparator.comparing(EventShortDto::getViews)
+                        .thenComparing(EventShortDto::getEventDate).reversed());
+            }
+        }
+
+        return eventDtos;
     }
 
     @Override

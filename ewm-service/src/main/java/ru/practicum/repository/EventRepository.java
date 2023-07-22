@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Query;
 import ru.practicum.EventStatus;
+import ru.practicum.dto.EventShortDto;
 import ru.practicum.model.Event;
 
 import java.time.LocalDateTime;
@@ -29,28 +30,25 @@ public interface EventRepository extends JpaRepository<Event, Long> {
                                @Param("rangeEnd") LocalDateTime rangeEnd,
                                Pageable pageable);
 
-    @Query("SELECT e FROM Event e " +
-            "WHERE (e.publishedOn IS NOT NULL) " +
-            "AND (:text IS NULL OR lower(e.annotation) LIKE %:text% OR lower(e.description) LIKE %:text%) " +
-            "AND (:categories IS NULL OR e.category.id IN (:categories)) " +
-            "AND (:paid IS NULL OR e.paid = :paid) " +
-            "AND (COALESCE(:rangeStart, CURRENT_TIMESTAMP) <= e.eventDate) " +
-            "AND (COALESCE(:rangeEnd, '9999-12-31T23:59:59') >= e.eventDate) " +
-            "AND (:onlyAvailable IS NULL OR (:onlyAvailable = FALSE " +
-            "    OR (e.participantLimit IS NULL AND e.confirmedRequests IS NULL) " +
-            "    OR (e.confirmedRequests < e.participantLimit))) " +
-            "ORDER BY " +
-            "CASE WHEN :sort = 'EVENT_DATE' THEN e.eventDate END ASC, " +
-            "CASE WHEN :sort = 'VIEWS' THEN 0 END DESC, " +
-            "e.created DESC")
-    Page<Event> getAllEvents(@Param("text") String text,
-                                  @Param("categories") List<Long> categories,
-                                  @Param("paid") Boolean paid,
-                                  @Param("rangeStart") LocalDateTime rangeStart,
-                                  @Param("rangeEnd") LocalDateTime rangeEnd,
-                                  @Param("onlyAvailable") Boolean onlyAvailable,
-                                  @Param("sort") String sort,
-                                  Pageable pageable);
+    @Query("SELECT e " +
+            "FROM Event e " +
+            "WHERE ((LOWER(e.annotation) LIKE CONCAT('%',lower(:text),'%') " +
+            "OR LOWER(e.description) LIKE CONCAT('%',lower(:text),'%')) " +
+            "OR :text IS NULL ) " +
+            "AND (e.category.id IN (:categories) OR :categories IS NULL) " +
+            "AND (e.paid IN (:paid) OR :paid IS NULL) " +
+            "AND (e.eventDate BETWEEN :rangeStart AND :rangeEnd) " +
+            "AND (:onlyAvailable = TRUE " +
+            "AND (e.confirmedRequests < e.participantLimit OR (e.confirmedRequests IS NULL " +
+            "AND e.participantLimit IS NOT NULL)) " +
+            "OR (:onlyAvailable = FALSE))")
+    List<Event> findAllEvents(@Param("text") String text,
+                              @Param("categories") List<Long> categories,
+                              @Param("paid") Boolean paid,
+                              @Param("rangeStart") LocalDateTime rangeStart,
+                              @Param("rangeEnd") LocalDateTime rangeEnd,
+                              @Param("onlyAvailable") Boolean onlyAvailable,
+                              Pageable pageable);
 
     List<Event> findAllByInitiatorId(Long initiatorId, Pageable pageable);
 
