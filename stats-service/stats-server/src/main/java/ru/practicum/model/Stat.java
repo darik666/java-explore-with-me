@@ -34,4 +34,20 @@ public class Stat {
 
     @Column(name = "timestamp")
     private LocalDateTime timestamp;
+
+    public void setApp(String app) {
+        this.app = app;
+    }
+
+    public void setUri(String uri) {
+        this.uri = uri;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
 }
