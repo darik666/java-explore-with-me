@@ -7,8 +7,9 @@ services:
     ports:
       - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://stats-db:5432/ewm_stats
-      - SERVER_PORT=9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/stats-db
+      - SPRING_DATASOURCE_USERNAME=stats
+      - SPRING_DATASOURCE_PASSWORD=stats
     depends_on:
       - stats-db
 
@@ -18,9 +19,9 @@ services:
     ports:
       - "5432:5432"
     environment:
-      - POSTGRES_DB=ewm_stats
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=stats-db
+      - POSTGRES_USER=stats
+      - POSTGRES_PASSWORD=stats
 
   ewm-service:
     build: ./ewm-service
@@ -29,8 +30,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ewm-db:5432/ewm_service
       - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/ewm-db
+      - SPRING_DATASOURCE_USERNAME=ewm
+      - SPRING_DATASOURCE_PASSWORD=ewm
       - STATS_SERVER_URL=http://stats-server:9090
     depends_on:
       - ewm-db
@@ -41,6 +44,6 @@ services:
     ports:
       - "6541:5432"
     environment:
-      - POSTGRES_DB=ewm_service
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=ewm_db
+      - POSTGRES_USER=ewm
+      - POSTGRES_PASSWORD=ewm
