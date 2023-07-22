@@ -2,6 +2,7 @@ package ru.practicum.service.requests;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EventStatus;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.exception.AlreadyExistsException;
@@ -35,6 +36,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public ParticipationRequestDto createParticipationRequest(Long userId, Long eventId) {
         Optional<ParticipationRequest> existingRequest =
@@ -64,7 +66,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new EventValidationException("Нельзя участвовать в неопубликованном событии.");
         }
 
-        if (event.getConfirmedRequests() == event.getParticipantLimit()) {
+        if (event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             throw new EventValidationException("Если у события достигнут лимит запросов на участие.");
         }
 
@@ -76,6 +78,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         return ParticipationRequestMapper.toParticipationDto(participationRequestRepository.save(request));
     }
 
+    @Transactional
     @Override
     public ParticipationRequestDto cancelRequest(Long userId, Long requestId) {
         ParticipationRequest participationRequest = participationRequestRepository

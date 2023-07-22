@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EventStatus;
 import ru.practicum.Sort;
 import ru.practicum.State;
@@ -49,6 +50,7 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public EventFullDto updateEventAdmin(Long eventId, UpdateEventAdminRequest updateEvent) {
         Event event = eventRepository.findById(eventId)
@@ -70,7 +72,6 @@ public class EventsServiceImpl implements EventsService {
 
         return EventMapper.toFullDto(eventRepository.save(updateEvent(event, EventMapper.toEventFromAdmUpdateDto(updateEvent))));
     }
-
 
     public Event updateEvent(Event event, Event updateEvent) {
         if (updateEvent.getTitle() != null) {
@@ -165,6 +166,7 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public EventFullDto create(Long userId, NewEventDto newEvent) {
         if (newEvent.getEventDate().isBefore(LocalDateTime.now().plusHours(2))) {
@@ -184,6 +186,7 @@ public class EventsServiceImpl implements EventsService {
         return EventMapper.toFullDto(event);
     }
 
+    @Transactional
     @Override
     public EventFullDto modifyEvent(Long userId, Long eventId, UpdateEventUserRequest updateEvent) {
         Event event = eventRepository.findById(eventId)
@@ -192,7 +195,7 @@ public class EventsServiceImpl implements EventsService {
             throw new EventValidationException("Дата и время на которые намечено событие " +
                     "не может быть раньше, чем через два часа от текущего момента");
         }
-        if (event.getState().equals(EventStatus.PENDING) || event.getState().equals(EventStatus.CANCELED)) {
+        if (event.getState().equals(State.PENDING) || event.getState().equals(State.CANCELED)) {
             throw new EventValidationException(String.format("Изменить можно только отмененные события " +
                     "или события в состоянии ожидания модерации"));
         }
@@ -210,7 +213,7 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
     }
 
-
+    @Transactional
     @Override
     public EventRequestStatusUpdateResult setStatusParticipationRequest(
             Long userId, Long eventId, EventRequestStatusUpdateRequest eventRequestStatus) {
@@ -220,7 +223,7 @@ public class EventsServiceImpl implements EventsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Пользователь с id=%d не найден", userId)));
 
-        if (event.getConfirmedRequests() == event.getParticipantLimit()) {
+        if (event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             List<ParticipationRequest> pendingRequests =
                     participationRequestRepository.findAllByEventIdAndStatus(event.getId(), EventStatus.PENDING);
             for (ParticipationRequest request : pendingRequests) {

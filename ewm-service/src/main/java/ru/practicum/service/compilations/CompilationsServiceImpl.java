@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.dto.UpdateCompilationRequest;
@@ -34,6 +35,7 @@ public class CompilationsServiceImpl implements CompilationsService {
         return CompilationMapper.toCompilationDto(compilation);
     }
 
+    @Transactional
     @Override
     public CompilationDto create(NewCompilationDto newDto) {
         Compilation compilation = CompilationMapper.toCompilationFromNew(newDto);
@@ -43,11 +45,13 @@ public class CompilationsServiceImpl implements CompilationsService {
         return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
+    @Transactional
     @Override
     public void delete(Long compId) {
         compilationRepository.deleteById(compId);
     }
 
+    @Transactional
     @Override
     public CompilationDto update(UpdateCompilationRequest dto, Long compId) {
         Compilation compilation = compilationRepository.findById(compId)
