@@ -162,10 +162,10 @@ public class EventsServiceImpl implements EventsService {
                 .collect(Collectors.toList());
 
         if (sort != null) {
-            if (sort.equals("EVENT_DATE")) {
+            if (sort.equals(Sort.valueOf("EVENT_DATE"))) {
                 eventDtos.sort(Comparator.comparing(EventShortDto::getEventDate)
                         .thenComparing(EventShortDto::getViews).reversed());
-            } else if (sort.equals("VIEWS")) {
+            } else if (sort.equals(Sort.valueOf("VIEWS"))) {
                 eventDtos.sort(Comparator.comparing(EventShortDto::getViews)
                         .thenComparing(EventShortDto::getEventDate).reversed());
             }
