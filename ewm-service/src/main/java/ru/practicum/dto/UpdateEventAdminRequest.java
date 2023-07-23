@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.ActionEnum;
 import ru.practicum.State;
 
 import javax.validation.constraints.Size;
@@ -31,7 +32,7 @@ public class UpdateEventAdminRequest {
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
-    private State stateAction;
+    private ActionEnum stateAction;
 
     @Size(min = 3, max = 120)
     private String title;

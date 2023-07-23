@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 @Component
 @AllArgsConstructor
 public class EventMapper {
-    private static CategoryRepository categoryRepository;
-    private static ParticipationRequestRepository requestRepository;
-    private static UserRepository userRepository;
-    private static EwmClient client;
+    private CategoryRepository categoryRepository;
+    private ParticipationRequestRepository requestRepository;
+    private UserRepository userRepository;
+    private EwmClient client;
 
-    public static Event fromNewDtoToEvent(Long userId, NewEventDto dto) {
+    public Event fromNewDtoToEvent(Long userId, NewEventDto dto) {
         Event event = new Event();
         event.setEventDate(dto.getEventDate());
         event.setState(State.PENDING);
@@ -50,7 +50,7 @@ public class EventMapper {
     }
 
     @Transactional
-    public static EventFullDto toFullDto(Event event) {
+    public EventFullDto toFullDto(Event event) {
         EventFullDto dto = new EventFullDto();
         dto.setId(event.getId());
         dto.setTitle(event.getTitle());
@@ -91,7 +91,7 @@ public class EventMapper {
     }
 
     @Transactional
-    public static EventShortDto toShortDto(Event event) {
+    public EventShortDto toShortDto(Event event) {
         EventShortDto dto = new EventShortDto();
         dto.setId(event.getId());
         dto.setTitle(event.getTitle());
@@ -124,7 +124,7 @@ public class EventMapper {
         return dto;
     }
 
-    public static Event toEventFromAdmUpdateDto(UpdateEventAdminRequest admDto) {
+    public Event toEventFromAdmUpdateDto(UpdateEventAdminRequest admDto) {
         Event event = new Event();
         event.setAnnotation(admDto.getAnnotation());
         event.setDescription(admDto.getDescription());
@@ -145,15 +145,17 @@ public class EventMapper {
         return event;
     }
 
-    public static Event toEventFromUpdateDto(UpdateEventUserRequest dto) {
+    public Event toEventFromUpdateDto(UpdateEventUserRequest dto) {
         Event event = new Event();
         event.setDescription(dto.getDescription());
         event.setPaid(dto.getPaid());
         event.setTitle(dto.getTitle());
 
-        event.setCategory(categoryRepository.findById(dto.getCategory())
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Категория с id=%d не найдена", dto.getCategory()))));
+        if (dto.getCategory() != null) {
+            event.setCategory(categoryRepository.findById(dto.getCategory())
+                    .orElseThrow(() -> new NotFoundException(
+                            String.format("Категория с id=%d не найдена", dto.getCategory()))));
+        }
 
         event.setParticipantLimit(dto.getParticipantLimit());
         event.setEventDate(dto.getEventDate());
@@ -161,7 +163,7 @@ public class EventMapper {
         return event;
     }
 
-    public static List<EventShortDto> getEventShortDtoList(List<Event> events) {
-        return events.stream().map(EventMapper::toShortDto).collect(Collectors.toList());
+    public List<EventShortDto> getEventShortDtoList(List<Event> events) {
+        return events.stream().map(this::toShortDto).collect(Collectors.toList());
     }
 }

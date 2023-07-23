@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EventStatus;
+import ru.practicum.State;
 import ru.practicum.dto.ParticipationRequestDto;
 import ru.practicum.exception.AlreadyExistsException;
 import ru.practicum.exception.EventValidationException;
@@ -62,11 +63,12 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new IllegalStateException("Инициатор события не может добавить запрос на участие в своём событии.");
         }
 
-        if (event.getPublishedOn() != null) {
+        if (event.getState() != State.PUBLISHED) {
             throw new EventValidationException("Нельзя участвовать в неопубликованном событии.");
         }
 
-        if (event.getConfirmedRequests().equals(event.getParticipantLimit())) {
+        if (event.getConfirmedRequests() != null
+                && event.getConfirmedRequests().equals(event.getParticipantLimit())) {
             throw new EventValidationException("Если у события достигнут лимит запросов на участие.");
         }
 

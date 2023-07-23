@@ -26,12 +26,12 @@ public class PublicEventsController {
             @RequestParam(value = "text", required = false, defaultValue = "") String text,
             @RequestParam(value = "categories", required = false) List<Long> categories,
             @RequestParam(value = "paid", required = false) Boolean paid,
-            @RequestParam(value = "rangeStart", required = false)
+            @RequestParam(value = "rangeStart", defaultValue = "2000-01-01 00:00:00")
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-            @RequestParam(value = "rangeEnd", required = false)
+            @RequestParam(value = "rangeEnd", defaultValue = "2100-12-31 23:59:59")
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @RequestParam(value = "onlyAvailable", required = false) Boolean onlyAvailable,
-            @RequestParam(value = "sort") Sort sort,
+            @RequestParam(value = "sort", required = false) Sort sort,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
             @RequestParam(defaultValue = "10") @Positive int size) {
 
@@ -39,8 +39,8 @@ public class PublicEventsController {
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto get(@PathVariable @Positive Long id,
+    public EventFullDto get(@PathVariable @Positive Long eventId,
                             HttpServletRequest httpServletRequest) {
-        return eventsService.getById(id, httpServletRequest);
+        return eventsService.getById(eventId, httpServletRequest);
     }
 }

@@ -40,10 +40,10 @@ public class Event {
     private User initiator;
 
     @Column(name = "participant_limit")
-    private Integer participantLimit;
+    private Integer participantLimit = 0;
 
     @Column(name = "confirmed_requests")
-    private Integer confirmedRequests;
+    private Integer confirmedRequests = 0;
 
     @Column(name = "lat")
     private Float lat;
