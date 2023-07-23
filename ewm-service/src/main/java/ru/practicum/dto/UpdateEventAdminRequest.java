@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.ActionEnum;
-import ru.practicum.State;
 
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
