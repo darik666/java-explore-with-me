@@ -1,7 +1,7 @@
 package ru.practicum.service.events;
 
-import ru.practicum.EventStatus;
 import ru.practicum.Sort;
+import ru.practicum.State;
 import ru.practicum.dto.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface EventsService {
     List<EventFullDto> getEvents(List<Long> users,
-                                          List<EventStatus> states,
+                                          List<State> states,
                                           List<Long> categories,
                                           LocalDateTime rangeStart,
                                           LocalDateTime rangeEnd,
@@ -26,7 +26,8 @@ public interface EventsService {
                                Boolean onlyAvailable,
                                Sort sort,
                                int from,
-                               int size);
+                               int size,
+                               HttpServletRequest httpServletRequest);
 
     EventFullDto getById(Long eventId, HttpServletRequest httpServletRequest);
 

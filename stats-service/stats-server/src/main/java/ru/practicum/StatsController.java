@@ -1,6 +1,7 @@
 package ru.practicum;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.ViewStatsDto;
 import ru.practicum.service.StatsService;
@@ -29,8 +30,9 @@ public class StatsController {
      * Сохранение просмотра эндпоинта
      */
     @PostMapping("/hit")
-    public void saveHit(@RequestBody EndpointHitDto dto) {
-        service.save(dto);
+    public ResponseEntity<Void> saveHit(@RequestBody EndpointHitDto dto) {
+        ResponseEntity<Void> response = service.save(dto);
+        return response;
     }
 
     /**

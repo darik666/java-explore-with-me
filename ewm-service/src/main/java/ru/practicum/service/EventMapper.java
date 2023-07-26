@@ -70,16 +70,18 @@ public class EventMapper {
 
         List<String> uris = new ArrayList<>();
         uris.add("/events/" + event.getId());
+        List<ViewStatsDto> responseList;
         try {
-            Object views = client.getViews(
+            responseList = client.getViews(
                     dto.getEventDate().minusYears(99),
                     dto.getEventDate().plusYears(99),
                     uris,
                     true
             );
-            List<ViewStatsDto> viewStats = (List<ViewStatsDto>) views;
-            if (!viewStats.isEmpty()) {
-                dto.setViews(viewStats.get(0).getHits().intValue());
+
+            if (!responseList.isEmpty()) {
+                ViewStatsDto viewStatsDto = responseList.get(0);
+                dto.setViews(viewStatsDto.getHits().intValue());
             } else {
                 dto.setViews(0);
             }

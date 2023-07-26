@@ -2,9 +2,12 @@ package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.EndpointHitDto;
+import ru.practicum.exception.StatValidationException;
 import ru.practicum.StatsRepository;
 import ru.practicum.dto.ViewStatsDto;
 
@@ -26,9 +29,10 @@ public class StatsServiceImpl implements StatsService {
      */
     @Override
     @Transactional
-    public void save(EndpointHitDto endpointHitDto) {
+    public ResponseEntity<Void> save(EndpointHitDto endpointHitDto) {
         log.debug("Сохранение просмотра эндпоинта: " + endpointHitDto);
         statsRepository.save(StatMapper.toStat(endpointHitDto));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     /**
@@ -36,6 +40,9 @@ public class StatsServiceImpl implements StatsService {
      */
     @Override
     public List<ViewStatsDto> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        if (start.isAfter(end)) {
+            throw new StatValidationException("Диапазон времени указан неверно");
+        }
         if (uris == null || uris.isEmpty()) {
             log.debug("Получение всей статистики");
             return statsRepository.findViewStatsWithoutUris(start, end, unique);

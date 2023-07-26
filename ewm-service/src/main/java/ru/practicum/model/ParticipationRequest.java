@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.EventStatus;
 
 import javax.persistence.*;
@@ -35,5 +36,6 @@ public class ParticipationRequest {
     private EventStatus status;
 
     @Column(name = "created")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime created;
 }

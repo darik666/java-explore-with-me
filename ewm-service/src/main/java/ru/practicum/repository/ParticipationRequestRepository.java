@@ -2,6 +2,7 @@ package ru.practicum.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import ru.practicum.EventStatus;
 import ru.practicum.model.ParticipationRequest;
 
@@ -15,8 +16,12 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
 
     Optional<ParticipationRequest> findByIdAndRequestorId(Long id, Long requestorId);
 
-    List<ParticipationRequest> findAllByRequestor_IdAndEvent_IdAndIdIn(
-            Long requestorId, Long eventId, List<Long> requestIds);
+    @Query("SELECT pr FROM ParticipationRequest pr " +
+            "WHERE pr.event.id = :eventId " +
+            "AND pr.id IN (:requestIds)")
+    List<ParticipationRequest> findAllByEventIdAndIdIn(
+            @Param("eventId") Long eventId,
+            @Param("requestIds") List<Long> requestIds);
 
     @Query(value = "SELECT COUNT(*) " +
             "FROM participation_requests " +
@@ -24,4 +29,6 @@ public interface ParticipationRequestRepository extends JpaRepository<Participat
     Integer getConfirmedRequestsByEventId(Long eventId);
 
     List<ParticipationRequest> findAllByEventId(Long eventId);
+
+    ParticipationRequest findByEventIdAndRequestorId(Long eventId, Long requestorId);
 }

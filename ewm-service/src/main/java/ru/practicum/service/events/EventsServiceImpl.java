@@ -40,7 +40,7 @@ public class EventsServiceImpl implements EventsService {
 
     @Override
     public List<EventFullDto> getEvents(List<Long> users,
-                                        List<EventStatus> states,
+                                        List<State> states,
                                         List<Long> categories,
                                         LocalDateTime rangeStart,
                                         LocalDateTime rangeEnd,
@@ -66,7 +66,7 @@ public class EventsServiceImpl implements EventsService {
             throw new EventValidationException("Дата начала изменяемого события должна быть не ранее чем за час от даты публикации.");
         }
 
-        if (updateEvent.getStateAction() == ActionEnum.PUBLISH_EVENT) {
+        if (updateEvent.getStateAction() == AdminActionEnum.PUBLISH_EVENT) {
             if (event.getState() == State.PENDING) {
                 event.setState(State.PUBLISHED);
                 event.setPublishedOn(LocalDateTime.now());
@@ -76,7 +76,7 @@ public class EventsServiceImpl implements EventsService {
             }
         }
 
-        if (updateEvent.getStateAction() == ActionEnum.REJECT_EVENT) {
+        if (updateEvent.getStateAction() == AdminActionEnum.REJECT_EVENT) {
             if (event.getState() != State.PUBLISHED) {
                 event.setState(State.CANCELED);
             } else {
@@ -132,9 +132,16 @@ public class EventsServiceImpl implements EventsService {
                                       Boolean onlyAvailable,
                                       Sort sort,
                                       int from,
-                                      int size) {
-        List<Event> events = eventRepository.findAllEvents(
-                text, categories, paid, rangeStart, rangeEnd, onlyAvailable, PageRequest.of(from, size));
+                                      int size,
+                                      HttpServletRequest httpServletRequest) {
+        List<Event> events;
+        if (onlyAvailable != null && onlyAvailable) {
+            events = eventRepository.findAllAvailableEvents(
+                    text, categories, paid, rangeStart, rangeEnd, PageRequest.of(from, size));
+        } else {
+            events = eventRepository.findAllEvents(
+                    text, categories, paid, rangeStart, rangeEnd, PageRequest.of(from, size));
+        }
 
         List<String> uris = events.stream()
                 .map(event -> "/events/" + event.getId())
@@ -173,19 +180,20 @@ public class EventsServiceImpl implements EventsService {
                         .thenComparing(EventShortDto::getEventDate).reversed());
             }
         }
-
+        ewmClient.addHit(httpServletRequest);
         return eventDtos;
     }
 
+    @Transactional
     @Override
     public EventFullDto getById(Long id, HttpServletRequest httpServletRequest) {
         Event event = eventRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id=%d не найдено", id)));
         String state = String.valueOf(event.getState());
         if (!state.equals("PUBLISHED")) {
-            throw new EventValidationException("Событие не опубликовано");
+            throw new NotFoundException("Событие не опубликовано");
         }
-
+        ewmClient.addHit(httpServletRequest);
         return eventMapper.toFullDto(event);
     }
 
@@ -234,6 +242,13 @@ public class EventsServiceImpl implements EventsService {
             throw new EventValidationException(String.format("Изменить можно только отмененные события " +
                     "или события в состоянии ожидания модерации"));
         }
+        if (updateEvent.getStateAction() != null) {
+            if (updateEvent.getStateAction() == UserActionEnum.SEND_TO_REVIEW) {
+                event.setState(State.PENDING);
+            } else {
+                event.setState(State.CANCELED);
+            }
+        }
         return eventMapper.toFullDto(eventRepository.save(newEvent));
     }
 
@@ -275,7 +290,8 @@ public class EventsServiceImpl implements EventsService {
 
     @Override
     public List<ParticipationRequestDto> getParticipationRequests(Long userId, Long eventId) {
-        getEventByIdAndUserId(userId, eventId);
+        userRepository.findById(userId);
+        eventRepository.findById(eventId);
 
         return participationRequestRepository.findAllByEventId(eventId)
                 .stream()
@@ -287,7 +303,6 @@ public class EventsServiceImpl implements EventsService {
     @Override
     public EventRequestStatusUpdateResult setStatusParticipationRequest(
             Long userId, Long eventId, EventRequestStatusUpdateRequest eventRequestStatus) {
-
         Event event = eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие с id=%d не найдено", eventId)));
         User user = userRepository.findById(userId)
@@ -305,20 +320,29 @@ public class EventsServiceImpl implements EventsService {
         }
 
         List<ParticipationRequest> requests =
-                participationRequestRepository.findAllByRequestor_IdAndEvent_IdAndIdIn(
-                        userId, eventId, eventRequestStatus.getRequestIds());
+                participationRequestRepository.findAllByEventIdAndIdIn(
+                        eventId, eventRequestStatus.getRequestIds());
 
-        if (event.getRequestModeration() || event.getParticipantLimit() > 0) {
+
+        if (event.getRequestModeration() && event.getParticipantLimit() >= 0) {
             for (ParticipationRequest request : requests) {
-                if (request.getStatus() == EventStatus.PENDING) {
-                    request.setStatus(eventRequestStatus.getStatus());
+                if (request.getStatus() == EventStatus.PENDING
+                        && eventRequestStatus.getStatus().equals(EventStatus.CONFIRMED)) {
+                    request.setStatus(EventStatus.CONFIRMED);
+                    event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+                    eventRepository.save(event);
+                } else if (request.getStatus() == EventStatus.PENDING
+                        && eventRequestStatus.getStatus().equals(EventStatus.REJECTED)) {
+                    request.setStatus(EventStatus.REJECTED);
+                    event.setConfirmedRequests(event.getConfirmedRequests() - 1);
+                    eventRepository.save(event);
                 } else {
                     throw new EventValidationException(
                             "Cтатус можно изменить только у заявок, находящихся в состоянии ожидания");
                 }
             }
         }
-
+        eventRepository.save(event);
         List<ParticipationRequest> resultRequests = participationRequestRepository.saveAll(requests);
         EventRequestStatusUpdateResult resultResponse = new EventRequestStatusUpdateResult();
         for (ParticipationRequest request: resultRequests) {

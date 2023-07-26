@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.UniqueElements;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class NewCompilationDto {
 
     private boolean pinned = false;
 
+    @NotBlank
     @Size(min = 1, max = 50)
     private String title;
 

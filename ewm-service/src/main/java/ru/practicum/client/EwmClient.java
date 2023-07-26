@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.EndpointHitDto;
 import ru.practicum.StatsClient;
+import ru.practicum.ViewStatsDto;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -29,7 +30,7 @@ public class EwmClient extends StatsClient {
         );
     }
 
-    public Object getViews(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+    public List<ViewStatsDto> getViews(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
         String url = "/stats?start=" + start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                 + "&end=" + end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
                 + "&uris=" + String.join(",", uris)

@@ -5,8 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.ActionEnum;
+import ru.practicum.AdminActionEnum;
 
+import javax.validation.constraints.Future;
 import javax.validation.constraints.Size;
 import java.time.LocalDateTime;
 
@@ -16,6 +17,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class UpdateEventAdminRequest {
 
+    @Size(min = 3, max = 120)
+    private String title;
+
     @Size(min = 20, max = 2000)
     private String annotation;
 
@@ -24,6 +28,7 @@ public class UpdateEventAdminRequest {
     @Size(min = 20, max = 7000)
     private String description;
 
+    @Future
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
 
@@ -31,8 +36,5 @@ public class UpdateEventAdminRequest {
     private Boolean paid;
     private Integer participantLimit;
     private Boolean requestModeration;
-    private ActionEnum stateAction;
-
-    @Size(min = 3, max = 120)
-    private String title;
+    private AdminActionEnum stateAction;
 }

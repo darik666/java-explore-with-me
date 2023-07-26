@@ -1,13 +1,16 @@
 package ru.practicum.controller.adminController;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.dto.CategoryDto;
 import ru.practicum.dto.NewCategoryDto;
 import ru.practicum.service.categories.CategoriesService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 
+@Valid
 @RestController
 @RequestMapping(path = "/admin/categories")
 public class AdminCategoriesController {
@@ -19,18 +22,22 @@ public class AdminCategoriesController {
     }
 
     @PostMapping
-    public CategoryDto createCategory(@RequestBody NewCategoryDto dto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public CategoryDto createCategory(@RequestBody @Valid NewCategoryDto dto) {
         return service.create(dto);
     }
 
     @DeleteMapping("/{catId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategory(@PathVariable @Positive Long catId) {
         service.delete(catId);
     }
 
-    @PatchMapping
-    public CategoryDto updateCategory(@RequestBody CategoryDto dto) {
-        return service.update(dto);
+    @PatchMapping("/{catId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CategoryDto updateCategory(@PathVariable @Positive Long catId,
+                                      @RequestBody @Valid CategoryDto dto) {
+        return service.update(catId, dto);
     }
 
 }

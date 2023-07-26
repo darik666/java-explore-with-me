@@ -5,6 +5,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.client.EwmClient;
 import ru.practicum.dto.CompilationDto;
 import ru.practicum.dto.NewCompilationDto;
 import ru.practicum.dto.UpdateCompilationRequest;
@@ -13,6 +14,7 @@ import ru.practicum.model.Compilation;
 import ru.practicum.repository.CompilationRepository;
 import ru.practicum.repository.EventRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,28 +23,33 @@ import java.util.stream.Collectors;
 public class CompilationsServiceImpl implements CompilationsService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
+    private final CompilationMapper compilationMapper;
+    private final EwmClient ewmClient;
 
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         Pageable pageable = PageRequest.of(from / size, size);
-        return compilationRepository.findAllByPinned(pinned, pageable).stream().map(CompilationMapper::toCompilationDto).collect(Collectors.toList());
+        return compilationRepository.findAllByPinned(pinned, pageable).stream()
+                .map(compilationMapper::toCompilationDto)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public CompilationDto getById(Long id) {
+    public CompilationDto getById(Long id, HttpServletRequest httpServletRequest) {
         Compilation compilation = compilationRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException(String.format("Подборка с id=%d не найдена", id)));
-        return CompilationMapper.toCompilationDto(compilation);
+        ewmClient.addHit(httpServletRequest);
+        return compilationMapper.toCompilationDto(compilation);
     }
 
     @Transactional
     @Override
     public CompilationDto create(NewCompilationDto newDto) {
-        Compilation compilation = CompilationMapper.toCompilationFromNew(newDto);
-        if (newDto.getEvents() != null && newDto.getEvents().size() > 0) {
+        Compilation compilation = compilationMapper.toCompilationFromNew(newDto);
+        if (newDto.getEvents() != null) {
             compilation.setEvents(eventRepository.findAllById(newDto.getEvents()));
         }
-        return CompilationMapper.toCompilationDto(compilationRepository.save(compilation));
+        return compilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
     @Transactional
@@ -60,10 +67,8 @@ public class CompilationsServiceImpl implements CompilationsService {
         compilation.setPinned(dto.isPinned());
         if (dto.getEvents() != null && !dto.getEvents().isEmpty()) {
             compilation.setEvents(eventRepository.findAllById(dto.getEvents()));
-        } else {
-            compilation.getEvents().clear();
         }
         Compilation updatedCompilation = compilationRepository.save(compilation);
-        return CompilationMapper.toCompilationDto(updatedCompilation);
+        return compilationMapper.toCompilationDto(updatedCompilation);
     }
 }

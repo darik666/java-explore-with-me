@@ -19,7 +19,6 @@ import ru.practicum.service.ParticipationRequestMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,14 +39,14 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
     @Transactional
     @Override
     public ParticipationRequestDto createParticipationRequest(Long userId, Long eventId) {
-        Optional<ParticipationRequest> existingRequest =
-                participationRequestRepository.findByIdAndRequestorId(eventId, userId);
-        if (existingRequest.isPresent()) {
+        ParticipationRequest existingRequest =
+                participationRequestRepository.findByEventIdAndRequestorId(eventId, userId);
+        if (existingRequest != null) {
             throw new AlreadyExistsException("Нельзя добавить повторный запрос.");
         }
 
         ParticipationRequest request = new ParticipationRequest();
-        request.setCreated(LocalDateTime.now());
+        request.setStatus(EventStatus.PENDING);
 
         User user = userRepository
                 .findById(userId)
@@ -67,16 +66,17 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             throw new EventValidationException("Нельзя участвовать в неопубликованном событии.");
         }
 
-        if (event.getConfirmedRequests() != null
+        if (event.getParticipantLimit() > 0
                 && event.getConfirmedRequests().equals(event.getParticipantLimit())) {
-            throw new EventValidationException("Если у события достигнут лимит запросов на участие.");
+            throw new EventValidationException("У события достигнут лимит запросов на участие.");
         }
 
-        if (event.getRequestModeration() == false) {
+        if (event.getRequestModeration() == false || event.getParticipantLimit() == 0) {
             request.setStatus(EventStatus.CONFIRMED);
+            event.setConfirmedRequests(event.getConfirmedRequests() + 1);
+            eventRepository.save(event);
         }
-
-        request.setStatus(EventStatus.PENDING);
+        request.setCreated(LocalDateTime.now());
         return ParticipationRequestMapper.toParticipationDto(participationRequestRepository.save(request));
     }
 

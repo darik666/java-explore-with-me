@@ -11,8 +11,16 @@ public class CategoryMapper {
         return new CategoryDto(category.getId(), category.getName());
     }
 
-    public static Category toCategory(NewCategoryDto dto) {
+    public static Category toCategoryfromNew(NewCategoryDto dto) {
         Category cat = new Category();
+        cat.setName(dto.getName());
+        cat.setCreated(LocalDateTime.now());
+        return cat;
+    }
+
+    public static Category toCategoryUpdate(CategoryDto dto, Long catId) {
+        Category cat = new Category();
+        cat.setId(catId);
         cat.setName(dto.getName());
         cat.setCreated(LocalDateTime.now());
         return cat;

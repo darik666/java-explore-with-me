@@ -2,19 +2,22 @@ package ru.practicum.controller.adminController;
 
 import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.practicum.EventStatus;
+import ru.practicum.State;
 import ru.practicum.dto.EventFullDto;
 import ru.practicum.dto.UpdateEventAdminRequest;
 import ru.practicum.service.events.EventsService;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Valid
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/admin/events")
@@ -22,13 +25,14 @@ public class AdminEventsController {
     private final EventsService eventsService;
 
     @GetMapping
+    @ResponseStatus(HttpStatus.OK)
     public List<EventFullDto> getEvents(
-            @RequestParam(value = "users", required = false) List<Long> users,
-            @RequestParam(value = "states", required = false) List<EventStatus> states,
-            @RequestParam(value = "categories", required = false) List<Long> categories,
-            @RequestParam(value = "rangeStart", required = false)
+            @RequestParam(required = false) List<Long> users,
+            @RequestParam(required = false) List<State> states,
+            @RequestParam(required = false) List<Long> categories,
+            @RequestParam(defaultValue = "2000-01-01 00:00:00")
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-            @RequestParam(value = "rangeEnd", required = false)
+            @RequestParam(defaultValue = "2100-12-31 23:59:59")
             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
             @RequestParam(defaultValue = "10") @Positive int size) {
@@ -36,8 +40,9 @@ public class AdminEventsController {
     }
 
     @PatchMapping("/{eventId}")
+    @ResponseStatus(HttpStatus.OK)
     public EventFullDto updateEvent(@PathVariable @Positive Long eventId,
-                                       @RequestBody UpdateEventAdminRequest updateEvent) {
+                                       @RequestBody @Valid UpdateEventAdminRequest updateEvent) {
         return eventsService.updateEventAdmin(eventId, updateEvent);
     }
 }

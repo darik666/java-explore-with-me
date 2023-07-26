@@ -1,5 +1,5 @@
 package ru.practicum;
 
-public enum ActionEnum {
+public enum AdminActionEnum {
     PUBLISH_EVENT, REJECT_EVENT
 }
