@@ -6,9 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.EwmClient;
-import ru.practicum.dto.CompilationDto;
-import ru.practicum.dto.NewCompilationDto;
-import ru.practicum.dto.UpdateCompilationRequest;
+import ru.practicum.dto.compilation.CompilationDto;
+import ru.practicum.dto.compilation.NewCompilationDto;
+import ru.practicum.dto.compilation.UpdateCompilationRequest;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Compilation;
 import ru.practicum.repository.CompilationRepository;
@@ -18,14 +18,21 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Сервисный класс подборок событий
+ */
 @Service
 @AllArgsConstructor
 public class CompilationsServiceImpl implements CompilationsService {
+
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final CompilationMapper compilationMapper;
     private final EwmClient ewmClient;
 
+    /**
+     * Получение списка подборок событий
+     */
     @Override
     public List<CompilationDto> getCompilations(Boolean pinned, Integer from, Integer size) {
         Pageable pageable = PageRequest.of(from / size, size);
@@ -34,6 +41,9 @@ public class CompilationsServiceImpl implements CompilationsService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Получение подборки событий по id
+     */
     @Override
     public CompilationDto getById(Long id, HttpServletRequest httpServletRequest) {
         Compilation compilation = compilationRepository.findById(id)
@@ -42,6 +52,9 @@ public class CompilationsServiceImpl implements CompilationsService {
         return compilationMapper.toCompilationDto(compilation);
     }
 
+    /**
+     * Создание подборки событий
+     */
     @Transactional
     @Override
     public CompilationDto create(NewCompilationDto newDto) {
@@ -52,12 +65,18 @@ public class CompilationsServiceImpl implements CompilationsService {
         return compilationMapper.toCompilationDto(compilationRepository.save(compilation));
     }
 
+    /**
+     * Удаление подборки событий
+     */
     @Transactional
     @Override
     public void delete(Long compId) {
         compilationRepository.deleteById(compId);
     }
 
+    /**
+     * Обновление подборки событий
+     */
     @Transactional
     @Override
     public CompilationDto update(UpdateCompilationRequest dto, Long compId) {

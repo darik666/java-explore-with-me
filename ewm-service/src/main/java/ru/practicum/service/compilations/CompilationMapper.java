@@ -2,18 +2,22 @@ package ru.practicum.service.compilations;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.dto.CompilationDto;
-import ru.practicum.dto.EventShortDto;
-import ru.practicum.dto.NewCompilationDto;
+import ru.practicum.dto.compilation.CompilationDto;
+import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.dto.compilation.NewCompilationDto;
 import ru.practicum.model.Compilation;
-import ru.practicum.service.EventMapper;
+import ru.practicum.service.events.EventMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Маппер подборок
+ */
 @Component
 @AllArgsConstructor
 public class CompilationMapper {
+
     private EventMapper eventMapper;
 
     public Compilation toCompilationFromNew(NewCompilationDto dto) {

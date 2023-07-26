@@ -1,8 +1,11 @@
 package ru.practicum.service.events;
 
-import ru.practicum.Sort;
-import ru.practicum.State;
-import ru.practicum.dto.*;
+import ru.practicum.dto.event.*;
+import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
+import ru.practicum.dto.request.EventRequestStatusUpdateResult;
+import ru.practicum.dto.request.ParticipationRequestDto;
+import ru.practicum.model.enums.Sort;
+import ru.practicum.model.enums.State;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -10,12 +13,12 @@ import java.util.List;
 
 public interface EventsService {
     List<EventFullDto> getEvents(List<Long> users,
-                                          List<State> states,
-                                          List<Long> categories,
-                                          LocalDateTime rangeStart,
-                                          LocalDateTime rangeEnd,
-                                          int from,
-                                          int size);
+                                 List<State> states,
+                                 List<Long> categories,
+                                 LocalDateTime rangeStart,
+                                 LocalDateTime rangeEnd,
+                                 int from,
+                                 int size);
 
     EventFullDto updateEventAdmin(Long eventId, UpdateEventAdminRequest updateEvent);
 

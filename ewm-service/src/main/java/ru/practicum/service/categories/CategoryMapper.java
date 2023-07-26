@@ -1,11 +1,14 @@
 package ru.practicum.service.categories;
 
-import ru.practicum.dto.CategoryDto;
-import ru.practicum.dto.NewCategoryDto;
+import ru.practicum.dto.category.CategoryDto;
+import ru.practicum.dto.category.NewCategoryDto;
 import ru.practicum.model.Category;
 
 import java.time.LocalDateTime;
 
+/**
+ * Маппер категорий
+ */
 public class CategoryMapper {
     public static CategoryDto toCategoryDto(Category category) {
         return new CategoryDto(category.getId(), category.getName());

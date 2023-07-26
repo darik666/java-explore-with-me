@@ -10,6 +10,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 
+/**
+ * Клиент сервиса статистики
+ */
 public class StatsClient {
     protected final RestTemplate rest;
 
@@ -18,7 +21,8 @@ public class StatsClient {
     }
 
     public ResponseEntity<List<ViewStatsDto>> getStats(String path) {
-        return makeAndSendRequest(HttpMethod.GET, path, null, new ParameterizedTypeReference<List<ViewStatsDto>>() {});
+        return makeAndSendRequest(HttpMethod.GET, path, null, new ParameterizedTypeReference<>() {
+        });
     }
 
     protected <T> ResponseEntity<T> postStats(String path, Object body) {

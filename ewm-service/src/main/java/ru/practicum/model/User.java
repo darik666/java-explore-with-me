@@ -8,6 +8,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Модель пользователей
+ */
 @Entity
 @Getter
 @Setter

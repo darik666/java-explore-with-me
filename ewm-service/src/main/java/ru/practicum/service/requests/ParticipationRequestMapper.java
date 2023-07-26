@@ -1,8 +1,11 @@
-package ru.practicum.service;
+package ru.practicum.service.requests;
 
-import ru.practicum.dto.ParticipationRequestDto;
+import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.model.ParticipationRequest;
 
+/**
+ * Маппер запросов на участие в событии
+ */
 public class ParticipationRequestMapper {
     public static ParticipationRequestDto toParticipationDto(ParticipationRequest part) {
         ParticipationRequestDto dto = new ParticipationRequestDto();

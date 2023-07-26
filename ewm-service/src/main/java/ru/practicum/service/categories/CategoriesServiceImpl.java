@@ -7,8 +7,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.EwmClient;
-import ru.practicum.dto.CategoryDto;
-import ru.practicum.dto.NewCategoryDto;
+import ru.practicum.dto.category.CategoryDto;
+import ru.practicum.dto.category.NewCategoryDto;
 import ru.practicum.exception.AlreadyExistsException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Category;
@@ -20,6 +20,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Сервисный класс категорий
+ */
 @Service
 @AllArgsConstructor
 public class CategoriesServiceImpl implements CategoriesService {
@@ -28,6 +31,9 @@ public class CategoriesServiceImpl implements CategoriesService {
     private final EventRepository eventRepository;
     private final EwmClient ewmClient;
 
+    /**
+     * Создание категории
+     */
     @Transactional
     @Override
     public CategoryDto create(NewCategoryDto dto) {
@@ -37,6 +43,9 @@ public class CategoriesServiceImpl implements CategoriesService {
         return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategoryfromNew(dto)));
     }
 
+    /**
+     * Удаление категории
+     */
     @Transactional
     @Override
     public void delete(Long id) {
@@ -47,6 +56,9 @@ public class CategoriesServiceImpl implements CategoriesService {
         categoryRepository.deleteById(id);
     }
 
+    /**
+     * Обновление категории
+     */
     @Transactional
     @Override
     public CategoryDto update(Long catId, CategoryDto dto) {
@@ -59,6 +71,9 @@ public class CategoriesServiceImpl implements CategoriesService {
         return CategoryMapper.toCategoryDto(categoryRepository.save(cat));
     }
 
+    /**
+     * Получение списка категорий
+     */
     @Override
     public List<CategoryDto> getAllCategories(int from, int size) {
         Pageable pageable = PageRequest.of(from, size);
@@ -66,6 +81,9 @@ public class CategoriesServiceImpl implements CategoriesService {
         return categories.stream().map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
     }
 
+    /**
+     * Получение категории по id
+     */
     @Override
     public CategoryDto getById(long catId, HttpServletRequest httpServletRequest) {
         Category cat = categoryRepository

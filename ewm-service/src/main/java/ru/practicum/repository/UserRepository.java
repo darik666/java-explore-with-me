@@ -7,6 +7,9 @@ import ru.practicum.model.User;
 
 import java.util.List;
 
+/**
+ * Репозиторий пользователей
+ */
 public interface UserRepository extends JpaRepository<User, Long> {
     Page<User> findByIdIn(List<Long> ids, Pageable pageable);
 

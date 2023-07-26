@@ -13,34 +13,30 @@ import javax.validation.ConstraintViolationException;
 import javax.validation.ValidationException;
 import java.time.LocalDateTime;
 
+/**
+ * Обработчик исключений
+ */
 @RestControllerAdvice
 public class ErrorHandler {
 
-        @ExceptionHandler
-        @ResponseStatus(HttpStatus.NOT_FOUND)
-        public ApiError handleNotFoundException(final NotFoundException e) {
-            String status = String.valueOf(HttpStatus.NOT_FOUND);
-            String reason = "The required object was not found.";
-            String message = e.getMessage();
-            LocalDateTime time = LocalDateTime.now();
-            return new ApiError(message, reason, status, time);
-        }
-
-        @ExceptionHandler
-        @ResponseStatus(HttpStatus.CONFLICT)
-        public ApiError handleEventValidationException(final EventValidationException e) {
-            String status = String.valueOf(HttpStatus.CONFLICT);
-            String reason = "Incorrectly made request.";
-            String message = e.getMessage();
-            LocalDateTime time = LocalDateTime.now();
-            return new ApiError(message, reason, status, time);
-        }
-
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiError handleThrowable(final Throwable e) {
-        e.printStackTrace();
-        return null;
+    public ApiError handleNotFoundException(final NotFoundException e) {
+        String status = String.valueOf(HttpStatus.NOT_FOUND);
+        String reason = "The required object was not found.";
+        String message = e.getMessage();
+        LocalDateTime time = LocalDateTime.now();
+        return new ApiError(message, reason, status, time);
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleEventValidationException(final EventValidationException e) {
+        String status = String.valueOf(HttpStatus.CONFLICT);
+        String reason = "Incorrectly made request.";
+        String message = e.getMessage();
+        LocalDateTime time = LocalDateTime.now();
+        return new ApiError(message, reason, status, time);
     }
 
     @ExceptionHandler
@@ -112,5 +108,4 @@ public class ErrorHandler {
         LocalDateTime time = LocalDateTime.now();
         return new ApiError(message, reason, status, time);
     }
-
 }

@@ -1,4 +1,4 @@
-package ru.practicum.dto;
+package ru.practicum.dto.event;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
-    private Long id;
-    private String email;
-    private String name;
+public class Location {
+    private float lat;
+    private float lon;
 }

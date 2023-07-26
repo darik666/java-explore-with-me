@@ -1,16 +1,18 @@
-package ru.practicum.service;
+package ru.practicum.service.events;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.practicum.State;
+import ru.practicum.dto.event.*;
+import ru.practicum.model.enums.State;
 import ru.practicum.ViewStatsDto;
 import ru.practicum.client.EwmClient;
-import ru.practicum.dto.*;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.model.Category;
 import ru.practicum.model.Event;
 import ru.practicum.repository.CategoryRepository;
 import ru.practicum.repository.ParticipationRequestRepository;
 import ru.practicum.repository.UserRepository;
+import ru.practicum.service.users.UserMapper;
 import ru.practicum.service.categories.CategoryMapper;
 
 import javax.transaction.Transactional;
@@ -19,6 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Маппер событий
+ */
 @Component
 @AllArgsConstructor
 public class EventMapper {
@@ -34,9 +39,7 @@ public class EventMapper {
         event.setAnnotation(dto.getAnnotation());
         event.setTitle(dto.getTitle());
         event.setDescription(dto.getDescription());
-        event.setCategory(categoryRepository.findById(dto.getCategory())
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Категория с id=%d не найдена", dto.getCategory()))));
+        event.setCategory(findCategory(dto.getCategory()));
         event.setInitiator(userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Пользователь с id=%d не найден", userId))));
@@ -88,7 +91,6 @@ public class EventMapper {
         } catch (Exception e) {
             dto.setViews(null);
         }
-
         return dto;
     }
 
@@ -122,7 +124,6 @@ public class EventMapper {
         } catch (Exception e) {
             dto.setViews(null);
         }
-
         return dto;
     }
 
@@ -131,9 +132,7 @@ public class EventMapper {
         event.setAnnotation(admDto.getAnnotation());
         event.setDescription(admDto.getDescription());
         event.setTitle(admDto.getTitle());
-        event.setCategory(categoryRepository.findById(admDto.getCategory())
-                .orElseThrow(() -> new NotFoundException(
-                        String.format("Категория с id=%d не найдена", admDto.getCategory()))));
+        event.setCategory(findCategory(admDto.getCategory()));
         event.setParticipantLimit(admDto.getParticipantLimit());
         event.setEventDate(admDto.getEventDate());
 
@@ -141,7 +140,6 @@ public class EventMapper {
             event.setLat(admDto.getLocation().getLat());
             event.setLon(admDto.getLocation().getLon());
         }
-
         event.setPaid(admDto.getPaid());
         event.setRequestModeration(admDto.getRequestModeration());
         return event;
@@ -152,13 +150,9 @@ public class EventMapper {
         event.setDescription(dto.getDescription());
         event.setPaid(dto.getPaid());
         event.setTitle(dto.getTitle());
-
         if (dto.getCategory() != null) {
-            event.setCategory(categoryRepository.findById(dto.getCategory())
-                    .orElseThrow(() -> new NotFoundException(
-                            String.format("Категория с id=%d не найдена", dto.getCategory()))));
+            event.setCategory(findCategory(dto.getCategory()));
         }
-
         event.setParticipantLimit(dto.getParticipantLimit());
         event.setEventDate(dto.getEventDate());
         event.setAnnotation(dto.getAnnotation());
@@ -167,5 +161,11 @@ public class EventMapper {
 
     public List<EventShortDto> getEventShortDtoList(List<Event> events) {
         return events.stream().map(this::toShortDto).collect(Collectors.toList());
+    }
+
+    public Category findCategory(Long catId) {
+        return categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException(
+                        String.format("Категория с id=%d не найдена", catId)));
     }
 }

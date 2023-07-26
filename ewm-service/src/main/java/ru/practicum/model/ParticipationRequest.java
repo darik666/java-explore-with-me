@@ -5,11 +5,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.practicum.EventStatus;
+import ru.practicum.model.enums.EventStatus;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
+/**
+ * Модель запросов на участие в событии
+ */
 @Getter
 @Setter
 @Entity

@@ -15,6 +15,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Клиент сервиса статистики
+ */
 @Service
 @Slf4j
 public class EwmClient extends StatsClient {
@@ -22,11 +25,10 @@ public class EwmClient extends StatsClient {
     private String appName;
 
     @Autowired
-    public EwmClient(@Value("${ewm-stats.url}") String serverUrl, RestTemplateBuilder builder) {
-        super(
-                builder
-                        .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
-                        .build()
+    public EwmClient(@Value("${STATS_SERVER_URL}") String serverUrl, RestTemplateBuilder builder) {
+        super(builder
+                .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
+                .build()
         );
     }
 

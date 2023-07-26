@@ -9,6 +9,9 @@ import ru.practicum.model.Category;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Репозиторий категорий
+ */
 @Repository
 public interface CategoryRepository extends JpaRepository<Category, Long> {
     Optional<Category> findByName(String name);

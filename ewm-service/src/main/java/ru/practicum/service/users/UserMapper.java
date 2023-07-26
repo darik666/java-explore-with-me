@@ -1,12 +1,15 @@
-package ru.practicum.service;
+package ru.practicum.service.users;
 
-import ru.practicum.dto.NewUserRequest;
-import ru.practicum.dto.UserDto;
-import ru.practicum.dto.UserShortDto;
+import ru.practicum.dto.user.NewUserRequest;
+import ru.practicum.dto.user.UserDto;
+import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.model.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * Маппер пользователей
+ */
 public class UserMapper {
     public static UserShortDto toUserShortDto(User user) {
         UserShortDto dto = new UserShortDto();

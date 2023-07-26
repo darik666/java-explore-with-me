@@ -4,9 +4,9 @@ import lombok.AllArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.Sort;
-import ru.practicum.dto.EventFullDto;
-import ru.practicum.dto.EventShortDto;
+import ru.practicum.model.enums.Sort;
+import ru.practicum.dto.event.EventFullDto;
+import ru.practicum.dto.event.EventShortDto;
 import ru.practicum.service.events.EventsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,6 +16,9 @@ import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Публичный контроллер событий
+ */
 @Valid
 @RestController
 @AllArgsConstructor
@@ -24,6 +27,9 @@ public class PublicEventsController {
 
     private final EventsService eventsService;
 
+    /**
+     * Получение событий с возможностью фильтрации
+     */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getAll(
@@ -46,6 +52,9 @@ public class PublicEventsController {
                 onlyAvailable, sort, from, size, httpServletRequest);
     }
 
+    /**
+     * Получение подробной информации об опубликованном событии по его идентификатору
+     */
     @GetMapping("/{eventId}")
     @ResponseStatus(HttpStatus.OK)
     public EventFullDto get(@PathVariable @Positive Long eventId,

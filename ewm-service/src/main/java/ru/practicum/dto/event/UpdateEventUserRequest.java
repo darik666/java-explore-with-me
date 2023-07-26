@@ -1,11 +1,11 @@
-package ru.practicum.dto;
+package ru.practicum.dto.event;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.UserActionEnum;
+import ru.practicum.model.enums.UserActionEnum;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.Size;
