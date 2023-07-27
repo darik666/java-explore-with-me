@@ -39,6 +39,6 @@ public class ParticipationRequest {
     private EventStatus status;
 
     @Column(name = "created")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @DateTimeFormat(pattern = "${datetime.default-format}")
     private LocalDateTime created;
 }

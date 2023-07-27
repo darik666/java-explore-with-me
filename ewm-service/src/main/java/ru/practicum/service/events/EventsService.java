@@ -4,6 +4,7 @@ import ru.practicum.dto.event.*;
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
+import ru.practicum.model.Event;
 import ru.practicum.model.enums.Sort;
 import ru.practicum.model.enums.State;
 
@@ -46,4 +47,10 @@ public interface EventsService {
 
     EventRequestStatusUpdateResult setStatusParticipationRequest(
             Long userId, Long eventId, EventRequestStatusUpdateRequest eventRequestStatus);
+
+    List<EventShortDto> getEventShortDtoList(List<Event> events);
+
+    List<EventFullDto> getEventFullDtoList(List<Event> events);
+
+    Long getViews(EventShortDto event);
 }

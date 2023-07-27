@@ -1,6 +1,6 @@
 package ru.practicum.controller.adminController;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.model.enums.State;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.UpdateEventAdminRequest;
+import ru.practicum.service.Constants;
 import ru.practicum.service.events.EventsService;
 
 import javax.validation.Valid;
@@ -22,7 +23,7 @@ import java.util.List;
  */
 @Valid
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping(path = "/admin/events")
 public class AdminEventsController {
 
@@ -37,10 +38,10 @@ public class AdminEventsController {
             @RequestParam(required = false) List<Long> users,
             @RequestParam(required = false) List<State> states,
             @RequestParam(required = false) List<Long> categories,
-            @RequestParam(defaultValue = "2000-01-01 00:00:00")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-            @RequestParam(defaultValue = "2100-12-31 23:59:59")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+            @RequestParam(defaultValue = Constants.DEFAULTSTARTTIME)
+            @DateTimeFormat(pattern = Constants.DATETIMEFORMAT) LocalDateTime rangeStart,
+            @RequestParam(defaultValue = Constants.DEFAULTENDTIME)
+            @DateTimeFormat(pattern = Constants.DATETIMEFORMAT) LocalDateTime rangeEnd,
             @RequestParam(defaultValue = "0") @PositiveOrZero int from,
             @RequestParam(defaultValue = "10") @Positive int size) {
         return eventsService.getEvents(users, states, categories, rangeStart, rangeEnd, from, size);

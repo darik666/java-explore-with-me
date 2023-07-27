@@ -1,6 +1,7 @@
 package ru.practicum.service.requests;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.model.enums.EventStatus;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Сервисный класс запроса на участие в событии
  */
+@Slf4j
 @Service
 @AllArgsConstructor
 public class ParticipationRequestServiceImpl implements ParticipationRequestService {
@@ -36,6 +38,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
      */
     @Override
     public List<ParticipationRequestDto> getParticipationRequestsByUserId(Long requestorId) {
+        log.debug("Получение заявки на участие в событии пользователя id=", requestorId);
         return participationRequestRepository.findAllByRequestorId(requestorId)
                 .stream()
                 .map(ParticipationRequestMapper::toParticipationDto)
@@ -51,6 +54,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         ParticipationRequest existingRequest =
                 participationRequestRepository.findByEventIdAndRequestorId(eventId, userId);
         if (existingRequest != null) {
+            log.warn("Нельзя добавить повторный запрос.");
             throw new AlreadyExistsException("Нельзя добавить повторный запрос.");
         }
 
@@ -68,15 +72,18 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
         request.setEvent(event);
 
         if (event.getInitiator().getId().equals(userId)) {
+            log.warn("Инициатор события не может добавить запрос на участие в своём событии.");
             throw new IllegalStateException("Инициатор события не может добавить запрос на участие в своём событии.");
         }
 
         if (event.getState() != State.PUBLISHED) {
+            log.warn("Нельзя участвовать в неопубликованном событии.");
             throw new EventValidationException("Нельзя участвовать в неопубликованном событии.");
         }
 
         if (event.getParticipantLimit() > 0
                 && event.getConfirmedRequests().equals(event.getParticipantLimit())) {
+            log.warn("У события достигнут лимит запросов на участие.");
             throw new EventValidationException("У события достигнут лимит запросов на участие.");
         }
 
@@ -86,6 +93,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
             eventRepository.save(event);
         }
         request.setCreated(LocalDateTime.now());
+        log.debug("Создание заявки на участие в событии: ", request);
         return ParticipationRequestMapper.toParticipationDto(participationRequestRepository.save(request));
     }
 
@@ -99,6 +107,7 @@ public class ParticipationRequestServiceImpl implements ParticipationRequestServ
                 .findByIdAndRequestorId(requestId, userId)
                 .orElseThrow(() -> new NotFoundException(String.format("Событие не найдено")));
         participationRequest.setStatus(EventStatus.CANCELED);
+        log.debug("Отмена заявки на участие в событии: ", participationRequest);
         return ParticipationRequestMapper.toParticipationDto(participationRequestRepository.save(participationRequest));
     }
 }

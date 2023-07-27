@@ -1,11 +1,14 @@
 package ru.practicum.service.requests;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.model.ParticipationRequest;
 
 /**
  * Маппер запросов на участие в событии
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ParticipationRequestMapper {
     public static ParticipationRequestDto toParticipationDto(ParticipationRequest part) {
         ParticipationRequestDto dto = new ParticipationRequestDto();

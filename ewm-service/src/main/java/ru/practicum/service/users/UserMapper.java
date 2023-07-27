@@ -1,5 +1,7 @@
 package ru.practicum.service.users;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.dto.user.NewUserRequest;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.dto.user.UserShortDto;
@@ -10,6 +12,7 @@ import java.time.LocalDateTime;
 /**
  * Маппер пользователей
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
     public static UserShortDto toUserShortDto(User user) {
         UserShortDto dto = new UserShortDto();

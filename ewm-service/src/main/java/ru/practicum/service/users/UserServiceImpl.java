@@ -1,6 +1,7 @@
 package ru.practicum.service.users;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +16,7 @@ import ru.practicum.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -34,6 +36,7 @@ public class UserServiceImpl implements UserService {
         } else {
             userPage = userRepository.findAll(pageable);
         }
+        log.debug("Получение списка пользователей: ", userPage.getContent());
         return userPage.stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
@@ -46,8 +49,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(NewUserRequest newUser) {
         if (userRepository.findByName(newUser.getName()) != null) {
-            throw new AlreadyExistsException("Пользователь с таким именем уже существует");
+            log.warn("Пользователь с именем {} уже существует", newUser.getName());
+            throw new AlreadyExistsException("Пользователь с именем " + newUser.getName() + "уже существует");
         }
+        log.debug("Создание пользователя: ", newUser);
         return UserMapper.toUserDto(userRepository.save(UserMapper.toUserFromNewDto(newUser)));
     }
 
@@ -57,6 +62,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @Override
     public void delete(Long userId) {
+        log.debug("Удаление пользователя id=", userId);
         userRepository.deleteById(userId);
     }
 }

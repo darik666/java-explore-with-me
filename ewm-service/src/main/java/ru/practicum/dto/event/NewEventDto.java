@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.service.Constants;
 
 import javax.validation.constraints.Future;
 import javax.validation.constraints.NotNull;
@@ -29,7 +30,7 @@ public class NewEventDto {
     private String description;
 
     @Future
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = Constants.DATETIMEFORMAT)
     private LocalDateTime eventDate;
 
     private Long category;

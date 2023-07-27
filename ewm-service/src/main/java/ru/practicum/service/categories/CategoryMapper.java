@@ -1,5 +1,7 @@
 package ru.practicum.service.categories;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.category.NewCategoryDto;
 import ru.practicum.model.Category;
@@ -9,7 +11,9 @@ import java.time.LocalDateTime;
 /**
  * Маппер категорий
  */
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CategoryMapper {
+
     public static CategoryDto toCategoryDto(Category category) {
         return new CategoryDto(category.getId(), category.getName());
     }

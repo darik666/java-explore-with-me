@@ -65,4 +65,14 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Event findByIdAndInitiatorId(Long userId, Long eventId);
 
     List<Event> findByCategoryId(Long categoryId);
+
+    @Query("SELECT e.id " +
+            "FROM Compilation c " +
+            "JOIN c.events e " +
+            "WHERE c.id = :compilationId")
+    List<Long> findEventIdsByCompilationId(@Param("compilationId") Long compilationId);
+
+    @Query("SELECT e FROM Event e " +
+            "WHERE e.id IN :ids")
+    List<Event> getEventsByIdList(@Param("ids") List<Long> ids);
 }

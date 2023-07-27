@@ -1,12 +1,13 @@
 package ru.practicum.controller.publicController;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.model.enums.Sort;
 import ru.practicum.dto.event.EventFullDto;
 import ru.practicum.dto.event.EventShortDto;
+import ru.practicum.service.Constants;
 import ru.practicum.service.events.EventsService;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,7 @@ import java.util.List;
  */
 @Valid
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping(path = "/events")
 public class PublicEventsController {
 
@@ -33,13 +34,13 @@ public class PublicEventsController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     public List<EventShortDto> getAll(
-            @RequestParam(value = "text", required = false, defaultValue = "") String text,
+            @RequestParam(value = "text", defaultValue = "") String text,
             @RequestParam(value = "categories", required = false) List<Long> categories,
             @RequestParam(value = "paid", required = false) Boolean paid,
-            @RequestParam(value = "rangeStart", defaultValue = "2000-01-01 00:00:00")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-            @RequestParam(value = "rangeEnd", defaultValue = "2100-12-31 23:59:59")
-            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+            @RequestParam(value = "rangeStart", defaultValue = Constants.DEFAULTSTARTTIME)
+            @DateTimeFormat(pattern = Constants.DATETIMEFORMAT) LocalDateTime rangeStart,
+            @RequestParam(value = "rangeEnd", defaultValue = Constants.DEFAULTENDTIME)
+            @DateTimeFormat(pattern = Constants.DATETIMEFORMAT) LocalDateTime rangeEnd,
             @RequestParam(value = "onlyAvailable", required = false) Boolean onlyAvailable,
             @RequestParam(value = "sort", required = false) Sort sort,
             @RequestParam(defaultValue = "0") @Positive int from,

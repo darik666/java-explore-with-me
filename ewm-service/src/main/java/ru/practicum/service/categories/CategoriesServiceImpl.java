@@ -1,6 +1,7 @@
 package ru.practicum.service.categories;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 /**
  * Сервисный класс категорий
  */
+@Slf4j
 @Service
 @AllArgsConstructor
 public class CategoriesServiceImpl implements CategoriesService {
@@ -38,8 +40,10 @@ public class CategoriesServiceImpl implements CategoriesService {
     @Override
     public CategoryDto create(NewCategoryDto dto) {
         if (categoryRepository.findByName(dto.getName()).isPresent()) {
-            throw new AlreadyExistsException("Категория с таким названием уже существует");
+            log.warn("Категория с названием {}", dto.getName());
+            throw new AlreadyExistsException("Категория с названием " + dto.getName() + " уже существует");
         }
+        log.debug("Создание категории: ", dto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(CategoryMapper.toCategoryfromNew(dto)));
     }
 
@@ -51,8 +55,10 @@ public class CategoriesServiceImpl implements CategoriesService {
     public void delete(Long id) {
         List<Event> events = eventRepository.findByCategoryId(id);
         if (events.size() > 0) {
+            log.warn("Категория связанная с событиями не может быть удалена");
             throw new DataIntegrityViolationException("Категория связана с событиями");
         }
+        log.debug("Удаление категории id=: ", id);
         categoryRepository.deleteById(id);
     }
 
@@ -68,6 +74,7 @@ public class CategoriesServiceImpl implements CategoriesService {
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Категория с id=%d не найдена", dto.getId())));
         cat.setName(category.getName());
+        log.debug("Обновление категории: ", dto);
         return CategoryMapper.toCategoryDto(categoryRepository.save(cat));
     }
 
@@ -78,6 +85,7 @@ public class CategoriesServiceImpl implements CategoriesService {
     public List<CategoryDto> getAllCategories(int from, int size) {
         Pageable pageable = PageRequest.of(from, size);
         List<Category> categories = categoryRepository.getAllCategoriesWithPagination(pageable);
+        log.debug("Получение списка категорий: ", categories);
         return categories.stream().map(CategoryMapper::toCategoryDto).collect(Collectors.toList());
     }
 
@@ -91,6 +99,7 @@ public class CategoriesServiceImpl implements CategoriesService {
                 .orElseThrow(() -> new NotFoundException(
                         String.format("Категория с id=%d не найдена", catId)));
         ewmClient.addHit(httpServletRequest);
+        log.debug("Получение категории: ", cat);
         return CategoryMapper.toCategoryDto(cat);
     }
 }
