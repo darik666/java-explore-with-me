@@ -1,5 +1,6 @@
 package ru.practicum;
 
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -7,6 +8,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+
+/**
+ * Клиент сервиса статистики
+ */
 public class StatsClient {
     protected final RestTemplate rest;
 
@@ -14,29 +20,30 @@ public class StatsClient {
         this.rest = rest;
     }
 
-    protected ResponseEntity<Object> getStats(String path) {
-        return makeAndSendRequest(HttpMethod.GET, path, null);
+    public ResponseEntity<List<ViewStatsDto>> getStats(String path) {
+        return makeAndSendRequest(HttpMethod.GET, path, null, new ParameterizedTypeReference<>() {
+        });
     }
 
-    protected <T> ResponseEntity<Object> postStats(String path, T body) {
-        return makeAndSendRequest(HttpMethod.POST, path, body);
+    protected <T> ResponseEntity<T> postStats(String path, Object body) {
+        return makeAndSendRequest(HttpMethod.POST, path, body, new ParameterizedTypeReference<>() {});
     }
 
-    private <T> ResponseEntity<Object> makeAndSendRequest(HttpMethod method, String path, @Nullable T body) {
-        HttpEntity<T> requestEntity = null;
+    private <T> ResponseEntity<T> makeAndSendRequest(HttpMethod method, String path, @Nullable Object body, ParameterizedTypeReference<T> responseType) {
+        HttpEntity<Object> requestEntity = null;
         if (body != null) {
             requestEntity = new HttpEntity<>(body);
         }
-        ResponseEntity<Object> response;
+        ResponseEntity<T> response;
         try {
-            response = rest.exchange(path, method, requestEntity, Object.class);
+            response = rest.exchange(path, method, requestEntity, responseType);
         } catch (HttpStatusCodeException e) {
-            return ResponseEntity.status(e.getStatusCode()).body(e.getResponseBodyAsByteArray());
+            return ResponseEntity.status(e.getStatusCode()).body(null);
         }
         return prepareStatsResponse(response);
     }
 
-    private static ResponseEntity<Object> prepareStatsResponse(ResponseEntity<Object> response) {
+    private static <T> ResponseEntity<T> prepareStatsResponse(ResponseEntity<T> response) {
         if (response.getStatusCode().is2xxSuccessful()) {
             return response;
         }
