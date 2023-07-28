@@ -50,6 +50,7 @@ public class EventMapper {
         dto.setEventDate(event.getEventDate());
         dto.setPublishedOn(String.valueOf(event.getPublishedOn()));
         dto.setCreatedOn(String.valueOf(event.getCreated()));
+        dto.setComments(event.getComments());
         return dto;
     }
 
@@ -90,19 +91,6 @@ public class EventMapper {
         event.setParticipantLimit(dto.getParticipantLimit());
         event.setEventDate(dto.getEventDate());
         event.setAnnotation(dto.getAnnotation());
-        return event;
-    }
-
-    public Event fromShortDtoToEvent(EventShortDto eventShortDto) {
-        Event event = new Event();
-        event.setId(event.getId());
-        event.setTitle(event.getTitle());
-        event.setAnnotation(event.getAnnotation());
-        event.setCategory(CategoryMapper.toCategoryUpdate(
-                eventShortDto.getCategory(), eventShortDto.getCategory().getId()));
-        event.setInitiator(event.getInitiator());
-        event.setPaid(event.getPaid());
-        event.setEventDate(event.getEventDate());
         return event;
     }
 }

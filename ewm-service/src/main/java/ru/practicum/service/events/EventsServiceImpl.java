@@ -9,12 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.*;
 import ru.practicum.client.EwmClient;
-import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.event.*;
 import ru.practicum.dto.request.EventRequestStatusUpdateRequest;
 import ru.practicum.dto.request.EventRequestStatusUpdateResult;
 import ru.practicum.dto.request.ParticipationRequestDto;
-import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.exception.EventValidationException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.Category;
@@ -188,17 +186,7 @@ public class EventsServiceImpl implements EventsService {
                             .mapToLong(ViewStatsDto::getHits)
                             .findFirst()
                             .orElse(0L);
-                    return new EventShortDto(
-                            event.getId(),
-                            event.getAnnotation(),
-                            new CategoryDto(event.getCategory().getId(), event.getCategory().getName()),
-                            event.getConfirmedRequests(),
-                            event.getEventDate(),
-                            new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()),
-                            event.getPaid(),
-                            event.getTitle(),
-                            viewsCount
-                    );
+                    return getEventShortDtoList(List.of(event)).get(0);
                 })
                 .collect(Collectors.toList());
 

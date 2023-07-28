@@ -14,3 +14,7 @@ allows you to post and search events to participate in.**
     *
 4. **"Compilations"**.
     * Compilations create, update, get and delete.
+    * 
+5. **"Comments"**.
+   * Comments create, update, get and delete.
+   * 

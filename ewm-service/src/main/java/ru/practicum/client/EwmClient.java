@@ -25,7 +25,7 @@ public class EwmClient extends StatsClient {
     private String appName;
 
     @Autowired
-    public EwmClient(@Value("${stats-server.url}") String serverUrl, RestTemplateBuilder builder) {
+    public EwmClient(@Value("${STATS_SERVER_URL}") String serverUrl, RestTemplateBuilder builder) {
         super(builder
                 .uriTemplateHandler(new DefaultUriBuilderFactory(serverUrl))
                 .build()
