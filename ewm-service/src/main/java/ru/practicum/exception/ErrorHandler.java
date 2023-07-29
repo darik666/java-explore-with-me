@@ -141,16 +141,4 @@ public class ErrorHandler {
         LocalDateTime time = LocalDateTime.now();
         return new ApiError(message, reason, status, time);
     }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiError handleThrow(final Throwable e) {
-        e.printStackTrace();
-        log.debug("hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh{}", e.getMessage(), e);
-        String status = String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR);
-        String reason = "INTERNAL_SERVER_ERROR";
-        String message = e.getMessage();
-        LocalDateTime time = LocalDateTime.now();
-        return new ApiError(message, reason, status, time);
-    }
 }
