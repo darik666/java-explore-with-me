@@ -18,7 +18,6 @@ import java.util.List;
 /**
  * Контроллер комментариев администратора
  */
-@Valid
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/admin/comments")
@@ -51,7 +50,7 @@ public class AdminCommentsController {
     @PatchMapping("/{commentId}")
     @ResponseStatus(HttpStatus.OK)
     public CommentDto updateComment(@PathVariable Long commentId,
-                                    @RequestBody NewCommentDto newCommentDto) {
+                                    @RequestBody @Valid NewCommentDto newCommentDto) {
         return commentsService.updateAdminComment(commentId, newCommentDto);
     }
 }

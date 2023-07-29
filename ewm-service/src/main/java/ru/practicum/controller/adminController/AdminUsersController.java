@@ -15,7 +15,6 @@ import java.util.List;
 /**
  * Контроллер пользователей администратора
  */
-@Valid
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/admin/users")

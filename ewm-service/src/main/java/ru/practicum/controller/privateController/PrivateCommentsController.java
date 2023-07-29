@@ -20,7 +20,6 @@ import java.util.List;
 /**
  * Приватный контроллер комментариев
  */
-@Valid
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/users/{userId}/comments")

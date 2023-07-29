@@ -7,7 +7,6 @@ import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.service.categories.CategoriesService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.util.Collection;
@@ -15,7 +14,6 @@ import java.util.Collection;
 /**
  * Публичный контроллер категорий
  */
-@Valid
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/categories")
@@ -39,7 +37,7 @@ public class PublicCategoriesController {
      */
     @GetMapping("/{catId}")
     @ResponseStatus(HttpStatus.OK)
-    public CategoryDto getById(@PathVariable @Positive long catId,
+    public CategoryDto getById(@PathVariable @Positive Long catId,
                                HttpServletRequest httpServletRequest) {
         return categoriesService.getById(catId, httpServletRequest);
     }

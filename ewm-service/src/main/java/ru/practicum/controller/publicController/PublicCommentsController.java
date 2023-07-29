@@ -8,14 +8,12 @@ import ru.practicum.dto.comment.CommentShortDto;
 import ru.practicum.service.comments.CommentsService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
  * Публичный контроллер комментариев
  */
-@Valid
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/comments/{eventId}")
