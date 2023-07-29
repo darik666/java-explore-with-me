@@ -236,7 +236,45 @@
 							"listen": "prerequest",
 							"script": {
 								"exec": [
-									""
+									"const main = async () => {\r",
+									"    const api = new API(pm);\r",
+									"    const rnd = new RandomUtils();\r",
+									"\r",
+									"    try {\r",
+									"        const user = await api.addUser(rnd.getUser());\r",
+									"        const category = await api.addCategory(rnd.getCategory());\r",
+									"        let eventBody = rnd.getEvent(category.id);\r",
+									"        eventBody['requestModeration'] = true;\r",
+									"        let event = await api.addEvent(user.id, eventBody);\r",
+									"        event = await api.publishEvent(event.id);\r",
+									"        const submittedUser = await api.addUser(rnd.getUser());\r",
+									"\r",
+									"        const comment = await api.addComment(submittedUser.id, rnd.getComment(event.id));\r",
+									"        console.log(\"After adding comment:\", comment);\r",
+									"\r",
+									"        pm.collectionVariables.set(\"commentId\", comment.id+1111);\r",
+									"        pm.collectionVariables.set(\"response\", comment);\r",
+									"        pm.collectionVariables.set(\"uid\", submittedUser.id);\r",
+									"    } catch(err) {\r",
+									"        console.error(\"Ошибка при подготовке тестовых данных.\", err);\r",
+									"    }\r",
+									"};\r",
+									"\r",
+									"const interval = setInterval(() => {}, 1000);\r",
+									"\r",
+									"setTimeout(async () => \r",
+									"    {\r",
+									"        try {\r",
+									"            // выполняем наш скрипт\r",
+									"            await main();\r",
+									"        } catch (e) {\r",
+									"            console.error(e);\r",
+									"        } finally {\r",
+									"            clearInterval(interval);\r",
+									"        }\r",
+									"    },  \r",
+									"    100 \r",
+									");"
 								],
 								"type": "text/javascript"
 							}
@@ -245,8 +283,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Ответ должен содержать код статуса 500 и данные в формате json\", function () {\r",
-									"    pm.response.to.have.status(500);\r",
+									"pm.test(\"Ответ должен содержать код статуса 404 и данные в формате json\", function () {\r",
+									"    pm.response.to.have.status(404);\r",
 									"    pm.response.to.be.withBody;\r",
 									"    pm.response.to.be.json;\r",
 									"});"
@@ -270,16 +308,21 @@
 							}
 						],
 						"url": {
-							"raw": "{{baseUrl}}/admin/comments/:commentId",
+							"raw": "{{baseUrl}}/users/:userId/comments/:commentId",
 							"host": [
 								"{{baseUrl}}"
 							],
 							"path": [
-								"admin",
+								"users",
+								":userId",
 								"comments",
 								":commentId"
 							],
 							"variable": [
+								{
+									"key": "userId",
+									"value": "2"
+								},
 								{
 									"key": "commentId",
 									"value": "666"
