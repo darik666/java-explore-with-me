@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.client.EwmClient;
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.CommentShortDto;
@@ -43,6 +44,7 @@ public class CommentsServiceImpl implements  CommentsService {
      * Создание комментария
      */
     @Override
+    @Transactional
     public CommentShortDto createComment(Long userId, NewCommentDto dto) {
         log.debug("Создание комментария: ", dto);
         User user = userRepository.findById(userId).orElseThrow(
@@ -60,6 +62,7 @@ public class CommentsServiceImpl implements  CommentsService {
      * Обновление комментария(пользователь)
      */
     @Override
+    @Transactional
     public CommentDto updateUserComment(Long userId, Long commentId, NewCommentDto newCommentDto) {
         log.debug("Обновление комментария с id=" + commentId + " на новый: ", newCommentDto);
         Comment comment = commentsRepository.findByIdAndEventIdAndAuthorId(
@@ -104,10 +107,10 @@ public class CommentsServiceImpl implements  CommentsService {
      * Удаление комментария
      */
     @Override
+    @Transactional
     public void deleteComment(Long userId, Long commentId) {
-        Comment comment = commentsRepository.findByIdAndAuthorId(commentId, userId).orElseThrow(
-                () -> new NotFoundException("Комментарий с id=" + commentId + "от пользователя id=" +
-                        userId + " событию id=" + " не найден."));
+        Comment comment = commentsRepository.findById(commentId).orElseThrow(
+                () -> new NotFoundException("Комментарий с id=" + commentId + " не найден."));
         log.debug("Удаление комментария: ", comment);
         commentsRepository.delete(comment);
     }
@@ -117,6 +120,7 @@ public class CommentsServiceImpl implements  CommentsService {
      * Обновление комментария(админмистратор)
      */
     @Override
+    @Transactional
     public CommentDto updateAdminComment(Long commentId, NewCommentDto newCommentDto) {
         Comment comment = commentsRepository.findByIdAndEventId(
                 commentId, newCommentDto.getEventId()).orElseThrow(() -> new NotFoundException(
