@@ -13,7 +13,6 @@ import javax.validation.constraints.Positive;
 /**
  * Контроллер категорий администратора
  */
-@Valid
 @RestController
 @RequestMapping(path = "/admin/categories")
 public class AdminCategoriesController {

@@ -1,4 +1,7 @@
 # java-explore-with-me
+
+PULL REQUEST: https://github.com/darik666/java-explore-with-me/pull/5
+
 **The Explore-with-me App 
 allows you to post and search events to participate in.**
 
@@ -14,3 +17,7 @@ allows you to post and search events to participate in.**
     *
 4. **"Compilations"**.
     * Compilations create, update, get and delete.
+    * 
+5. **"Comments"**.
+   * Comments create, update, get and delete.
+   * 

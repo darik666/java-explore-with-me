@@ -11,7 +11,6 @@ import ru.practicum.service.Constants;
 import ru.practicum.service.events.EventsService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import javax.validation.ValidationException;
 import javax.validation.constraints.Positive;
 import java.time.LocalDateTime;
@@ -20,7 +19,6 @@ import java.util.List;
 /**
  * Публичный контроллер событий
  */
-@Valid
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/events")

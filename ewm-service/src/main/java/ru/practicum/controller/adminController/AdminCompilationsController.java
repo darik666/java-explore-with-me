@@ -14,7 +14,6 @@ import javax.validation.constraints.Positive;
 /**
  * Контроллер подборок событий администратора
  */
-@Valid
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/admin/compilations")

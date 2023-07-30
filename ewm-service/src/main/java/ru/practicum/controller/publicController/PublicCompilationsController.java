@@ -7,14 +7,12 @@ import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.service.compilations.CompilationsService;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
 /**
  * Публичный контроллер подборок событий
  */
-@Valid
 @RestController
 @RequestMapping(path = "/compilations")
 public class PublicCompilationsController {

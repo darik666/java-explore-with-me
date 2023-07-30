@@ -5,7 +5,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import ru.practicum.model.Comment;
 import ru.practicum.service.Constants;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,4 +28,5 @@ public class EventFullDto extends EventShortDto {
 
     private boolean requestModeration = true;
     private String state;
+    private List<Comment> comments;
 }

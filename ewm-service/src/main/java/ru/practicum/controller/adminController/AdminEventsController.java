@@ -21,7 +21,6 @@ import java.util.List;
 /**
  * Контроллер событий администратора
  */
-@Valid
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(path = "/admin/events")
